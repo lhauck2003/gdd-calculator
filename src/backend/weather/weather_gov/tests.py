@@ -94,7 +94,7 @@ def test_weather_request_uses_requests_get_with_params(monkeypatch):
 
     response = client.weather_request(req)
 
-    assert response == {"features": []}
+    assert response == []
     assert calls == [
         (
             "https://api.weather.gov/stations/KSEA/observations",
@@ -225,7 +225,7 @@ def test_weather_request_integration_hits_observations_api():
 def test_gov_client_weather_request_integration_uses_live_api():
     client = GOVClient()
     req = WeatherRequest(
-        start="2026-01-01T00:00:00Z",
+        start="2026-03-22T00:00:00Z",
         end="2026-03-23T00:00:00Z",
         cursor=None,
         limit=None,
@@ -236,8 +236,9 @@ def test_gov_client_weather_request_integration_uses_live_api():
     payload = client.weather_request(req)
     #print(f"Features: {payload["features"]}")
 
-    assert payload["type"] == "FeatureCollection"
-    assert isinstance(payload["features"], list)
+    assert payload is not None
+    print(payload)
+    assert isinstance(payload, list)
 
 @requires_live_api
 def test_gov_client_stations_request_uses_live_api():

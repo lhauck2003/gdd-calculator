@@ -120,7 +120,15 @@ class GOVClient:
         )
         obs.raise_for_status()
         obs_data = obs.json()
-        return obs_data
+
+        features = obs_data["features"]
+        if "pagination" in obs_data.keys():
+            obs_next = requests.get(obs_data["pagination"]["next"])
+            obs_next.raise_for_status()
+            obs_next_data = obs_next.json()
+            new_features = obs_next_data["features"]
+            features.extend(new_features)
+        return features
     # TODO
     # for each request in the list, request the data
     #
