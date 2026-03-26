@@ -15,7 +15,7 @@ def client():
 
 @pytest.fixture
 def weather(client):
-    return DailyWeatherRange("2026-03-10T00:00:00Z", "KBIL", client)
+    return DailyWeatherRange("2026-01-01T00:00:00Z", "KBIL", client)
 
 def test_simple_calc(calculator, weather):
     calc_type = "simple"

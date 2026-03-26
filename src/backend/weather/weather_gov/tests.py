@@ -246,5 +246,5 @@ def test_gov_client_stations_request_uses_live_api():
     stations_request = StationRequest(45.9600, -108.1610)
 
     payload = client.get_station_list(stations_request, limit=10)
-    #print(f"List: {payload}")
+    print(f"List: {payload}")
     assert payload is not None
