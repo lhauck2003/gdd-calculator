@@ -1,4 +1,4 @@
-# client to interact with NOAA weather API
+# client to interact with weather.gov API
 from typing import List, Optional, Union, Dict
 import requests
 import os
@@ -120,7 +120,16 @@ class GOVClient:
         )
         obs.raise_for_status()
         obs_data = obs.json()
-        return obs_data
+
+        features = obs_data["features"]
+        # get all next pages
+        while "pagination" in obs_data.keys():
+            obs = requests.get(obs_data["pagination"]["next"], headers=HEADERS)
+            obs.raise_for_status()
+            obs_data = obs.json()
+            new_features = obs_data["features"]
+            features.extend(new_features)
+        return features
     # TODO
     # for each request in the list, request the data
     #

@@ -18,7 +18,7 @@ class StationOptions:
 
     @property
     def state(self):
-        return self.metadate["state"]
+        return self.metadata["state"]
     
     # returns list of stations
     def stations(self):
@@ -26,7 +26,7 @@ class StationOptions:
 
     def get_station_metadata(self):
         index: int = self.client.add_to_requests(self.station_request)
-        response = self.client.station_request()[index]
+        response = self.client.station_request(self.station_request)[index]
         return response["properties"]
     
 class Station:
@@ -41,38 +41,43 @@ class Station:
 class WeatherInfo:
     def __init__(self, weather_data):
         self.properties = weather_data["properties"]
-        self.station = weather_data["station"]
-        self.stationId = weather_data["stationId"]
-        self.stationName = weather_data["stationName"]
-        self.timestamp = weather_data["timestamp"]
-        self.rawMessage =  weather_data["rawMessage"]
-        self.textDescription = weather_data["textDescription"]
-        self.presentWeather = weather_data["presentWeather"][0]
-        self.temperature = weather_data["temperature"]
-        self.dewpoint = weather_data["dewpoint"]
-        self.windDirection = weather_data["windDirection"]
-        self.windSpeed = weather_data["windSpeed"]
-        self.windGust = weather_data["windGust"]
-        self.barometricPressure = weather_data["barometricPressure"]
-        self.seaLevelPressure = weather_data["seaLevelPressure"]
-        self.visibility = weather_data["visibility"]
-        self.maxTemperatureLast24Hours = weather_data["maxTemperatureLast24Hours"]
-        self.minTemperatureLast24Hours = weather_data["minTemperatureLast24Hours"]
-        self.precipitationLastHour = weather_data["precipitationLastHour"]
-        self.precipitationLast3Hours = weather_data["precipitationLast3Hours"]
-        self.precipitationLast6Hours = weather_data["precipitationLast6Hours"]
-        self.relativeHumidity = weather_data["relativeHumidity"]
-        self.windChill = weather_data["windChill"]
-        self.heatIndex = weather_data["heatIndex"]
-        self.cloudLayers = weather_data["cloudLayers"]
+        self.station = weather_data["properties"]["station"]
+        self.stationId = weather_data["properties"]["stationId"]
+        self.stationName = weather_data["properties"]["stationName"]
+        self.timestamp = weather_data["properties"]["timestamp"]
+        self.rawMessage =  weather_data["properties"]["rawMessage"]
+        self.textDescription = weather_data["properties"]["textDescription"]
+        self.presentWeather = weather_data["properties"]["presentWeather"]
+        self.temperature = weather_data["properties"].get("temperature", {})
+        self.dewpoint = weather_data["properties"]["dewpoint"]
+        self.windDirection = weather_data["properties"]["windDirection"]
+        self.windSpeed = weather_data["properties"]["windSpeed"]
+        self.windGust = weather_data["properties"]["windGust"]
+        self.barometricPressure = weather_data["properties"]["barometricPressure"]
+        self.seaLevelPressure = weather_data["properties"]["seaLevelPressure"]
+        self.visibility = weather_data["properties"]["visibility"]
+        self.maxTemperatureLast24Hours = weather_data["properties"]["maxTemperatureLast24Hours"]
+        self.minTemperatureLast24Hours = weather_data["properties"]["minTemperatureLast24Hours"]
+        #self.precipitationLastHour = weather_data["properties"]["precipitationLastHour"]
+        #self.precipitationLast3Hours = weather_data["properties"]["precipitationLast3Hours"]
+        #self.precipitationLast6Hours = weather_data["properties"]["precipitationLast6Hours"]
+        #self.relativeHumidity = weather_data["properties"]["relativeHumidity"]
+        #self.windChill = weather_data["properties"]["windChill"]
+        #self.heatIndex = weather_data["properties"]["heatIndex"]
+        #self.cloudLayers = weather_data["properties"]["cloudLayers"]
     
     @property
     def temp_high(self):
-        return self.temperature["maxValue"]
+        if "maxValue" in self.temperature.keys():
+            return self.temperature["maxValue"]
+        else:
+            return self.temperature["value"]
 
     @property
     def temp_low(self):
-        return self.temperature["minValue"]
+        if "minValue" in self.temperature.keys():
+            return self.temperature["minValue"]
+        return self.temperature["value"]
     
     @property
     def temp_avg(self):
@@ -86,8 +91,8 @@ class DailyWeatherRange:
             station_id: str, 
             client: GOVClient
         ):
-        self.start_day = start_day if isinstance(start_day, str) else strftime(start_day)
-        self.curr_day = strftime("%Y-%M-%d", localtime())
+        self.start_day = start_day #if isinstance(start_day, str) else strftime(start_day)
+        self.curr_day = strftime("%Y-%m-%dT%H:%M:%SZ", gmtime())
         self.client: GOVClient = client
         self.station = Station(station_id=station_id, client=self.client)
         self.weather_data = self.get_weather_data()
@@ -97,9 +102,8 @@ class DailyWeatherRange:
     def station_id(self):
         return self.station.station_id
 
-    @property
     def __iter__(self):
-        yield from self.daily_weather_list()
+        yield from self.daily_weather_list
 
     def get_daily_weather_list(self):
         daily_data: Dict[str, List[dict]] = {}
@@ -110,7 +114,8 @@ class DailyWeatherRange:
             if not timestamp:
                 continue
 
-            day = timestamp.split("T", 1)[0]
+            # timestamp looks like 2026-03-24T00:00:00Z
+            day = timestamp.split("T")[0]
             if day in daily_data:
                 daily_data[day].append(entry)
             else:
@@ -125,13 +130,15 @@ class DailyWeatherRange:
     def get_weather_data(self):
         r: WeatherRequest = WeatherRequest(self.start_day, self.curr_day, cursor=None, limit=None, stationId=self.station_id)
         response = self.client.weather_request(r)
-        return response["features"]
+        return response
     
     def get_daily_temp_highs(self) -> List[int]:
-        pass
+        return [entry.get_temp_high() 
+                for entry in self.daily_weather_list]
 
     def get_daily_temp_lows(self) -> List[int]:
-        pass
+        return [entry.get_temp_low() 
+                for entry in self.daily_weather_list]
 
     def get_daily_temp_avg(self) -> List[int]:
         pass
@@ -145,11 +152,9 @@ class DayWeatherInfo:
     # TODO:
     # return the day if %Y-%M-%d format for the instance
     @property
-    def day(self, weather_data):
+    def day(self):
         pass
         
-
-    @property
     def __iter__(self):
         yield from self.weather_list
 
@@ -164,10 +169,12 @@ class DayWeatherInfo:
         return weather_list
 
     def get_temp_high(self):
-        pass
+        return max([entry.temp_high for entry in self.weather_list if entry
+                    if entry and entry.temp_high is not None])
 
     def get_temp_low(self):
-        pass
+        return min([entry.temp_low for entry in self.weather_list if entry
+                    if entry and entry.temp_low is not None])
 
     def get_temp_avg(self):
         pass
