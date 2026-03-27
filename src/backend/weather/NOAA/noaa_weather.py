@@ -12,6 +12,10 @@ class NOAAInterface:
     def __init__(self, client: NOAAClient):
         self.client = client
 
+    def check_station(self, stationid: Optional[str]) -> bool:
+        check = self.client.stations(stationid=stationid)
+        return check["id"] == stationid
+
     def search_stations_by_lat_long(
             self, 
             lat:Optional[float], 
