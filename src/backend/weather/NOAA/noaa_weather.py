@@ -1,5 +1,6 @@
 from typing import Optional, Union, List, Dict
 import time
+from time import struct_time
 from datetime import datetime, date, timedelta
 from .noaa_client import NOAAClient
 from .cache.states import states
@@ -14,8 +15,8 @@ class NOAAInterface:
 
     def check_station(self, stationid: Optional[str]) -> bool:
         check = self.client.stations(stationid=stationid)
-        return check["id"] == stationid
-
+        return stationid == check.get("id", "")
+    
     def search_stations_by_lat_long(
             self, 
             lat:Optional[float], 
@@ -155,3 +156,31 @@ class NOAAInterface:
 
     def get_cities_by_state(self, state: Optional[str]):
         return self.client.get_cities_by_state(state)
+    
+    def get_temp_high_by_day(self, stationid: Optional[str] = None, date: Union[Optional[str],Optional[struct_time]] = None):
+        if isinstance(date, struct_time):
+            date=time.strftime("%Y-%m-%d", date)
+        else:
+            # assert string matches correct input
+            pass
+        results = self.search_data_by_station(stationid=stationid, startdate=date, enddate=date)
+        for item in results.get("results", []):
+            if item.get("datatype", "")== "TMAX":
+                value = item.get("value", -99999) # -99999 means value was not listed
+                break
+        
+        return float(value)/10
+            
+    def get_temp_low_by_day(self, stationid: Optional[str] = None, date: Union[Optional[str],Optional[struct_time]] = None):
+        if isinstance(date, struct_time):
+            date=time.strftime("%Y-%m-%d", date)
+        else:
+            # assert string matches correct input
+            pass
+        results = self.search_data_by_station(stationid=stationid, startdate=date, enddate=date)
+        for item in results.get("results", []):
+            if item.get("datatype", "")== "TMIN":
+                value = item.get("value", -99999) # -99999 means value was not listed
+                break
+        
+        return float(value)/10
