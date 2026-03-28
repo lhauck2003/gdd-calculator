@@ -102,12 +102,8 @@ class OpenWeatherClient:
         response_data = response.json()
         return response_data
 
-    # lat
-    # lon
-    # appid
-    # date
-    # units
-    # lang
+    # INPUTS: lat, lon, appid, date, units,lang
+    # OUPUT FIELDS: see urls
     def fetch_daily_aggregation_weather(
             self,
             lat: Optional[float] = None, # required

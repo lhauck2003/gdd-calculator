@@ -1,5 +1,7 @@
 from time import strptime
 
+current_weather_fields = []
+
 def is_valid_format(time_string, format_code="%Y-%m-%d"):
     try:
         strptime(time_string, format_code)
