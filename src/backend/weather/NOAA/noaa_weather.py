@@ -167,9 +167,9 @@ class NOAAInterface:
         for item in results.get("results", []):
             if item.get("datatype", "")== "TMAX":
                 value = item.get("value", -99999) # -99999 means value was not listed
-                break
+                return float(value)/10
         
-        return float(value)/10
+        return -99999.9
             
     def get_temp_low_by_day(self, stationid: Optional[str] = None, date: Union[Optional[str],Optional[struct_time]] = None):
         if isinstance(date, struct_time):
@@ -181,6 +181,6 @@ class NOAAInterface:
         for item in results.get("results", []):
             if item.get("datatype", "")== "TMIN":
                 value = item.get("value", -99999) # -99999 means value was not listed
-                break
+                return float(value)/10
         
-        return float(value)/10
+        return -99999.9

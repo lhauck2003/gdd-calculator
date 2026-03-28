@@ -24,9 +24,6 @@ class GDDCalculator:
     def calculate_be_day(self, daily_temperatures: List[int]):
         pass
 
-    def _calculate(self, calculator) -> Tuple[List[float],List[float]]:
-       return calculator
-
     def calculate(self, calc_type: str, weather: DailyWeatherRange) -> Tuple[List[float],List[float]]:
         options = {
             "simple": self.calculate_simple,
