@@ -57,7 +57,7 @@ class GDDCalculator:
         gdd_total = []
         gdd_day = []
         while curr_date <= end_date:
-            gdd = self.calculate_day(calc_type, weather, curr_date)
+            gdd = self.calculate_day(calc_type, weather, curr_date.timetuple())
             gdd_tot += gdd
             gdd_day.append(gdd)
             gdd_total.append(gdd_tot)
