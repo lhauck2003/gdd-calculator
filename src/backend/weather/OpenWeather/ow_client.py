@@ -7,9 +7,8 @@ from .urls import OPENWEATHER_API_BASE, OPENWEATHER_API_DAILY_AGG, OPENWEATHER_A
 from .utils import is_valid_format
 
 class OpenWeatherClient:
-    def __init__(self):
-        self.api_key = os.getenv("OPENWEATHER_API_KEY")
-
+    def __init__(self, api_key):
+        self.api_key = api_key
     # ------------------------------
     # Basic API Calls
     # ------------------------------
