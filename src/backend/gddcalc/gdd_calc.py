@@ -3,7 +3,7 @@ import time
 from time import struct_time, mktime, strptime
 import datetime
 from datetime import timedelta  
-from ..weather.weather import (
+from weather.weather import (
     Weather, WeatherLocation, WeatherStation
 )
 

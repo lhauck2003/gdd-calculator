@@ -8,6 +8,8 @@ from time import strptime
 # gdd_daily [1, 1, 1, ...]
 # days ["YYYY-MM-DD", ...]
 # life_stages [{"Lifestage1": GDD}, {"Life_stage2": GDD}, ...]
+#
+# Returns: html code for plot
 def plot_gdd(
         gdd_totals: Optional[List[float]] = None, 
         gdd_daily: Optional[List[float]] = None, 
