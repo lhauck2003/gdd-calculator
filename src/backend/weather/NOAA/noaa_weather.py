@@ -49,7 +49,7 @@ class NOAAInterface:
             stationid: Optional[str],
             startdate: Optional[str],
             enddate: Optional[str],
-            units: Optional[str],
+            units: Optional[str] = None,
             datasetid: Optional[str] = "GHCND"
     ):
         start = time.strptime(startdate, "%Y-%m-%d")
@@ -157,7 +157,7 @@ class NOAAInterface:
     def get_cities_by_state(self, state: Optional[str]):
         return self.client.get_cities_by_state(state)
     
-    def get_temp_high_by_day(self, stationid: Optional[str] = None, date: Union[Optional[str],Optional[struct_time]] = None):
+    def get_temp_high_by_day(self, stationid: Optional[str] = None, date: Union[Optional[str],Optional[struct_time]] = None) -> float:
         if isinstance(date, struct_time):
             date=time.strftime("%Y-%m-%d", date)
         else:
@@ -167,11 +167,11 @@ class NOAAInterface:
         for item in results.get("results", []):
             if item.get("datatype", "")== "TMAX":
                 value = item.get("value", -99999) # -99999 means value was not listed
-                break
+                return float(value)/10
         
-        return float(value)/10
+        return -99999.9
             
-    def get_temp_low_by_day(self, stationid: Optional[str] = None, date: Union[Optional[str],Optional[struct_time]] = None):
+    def get_temp_low_by_day(self, stationid: Optional[str] = None, date: Union[Optional[str],Optional[struct_time]] = None) -> float:
         if isinstance(date, struct_time):
             date=time.strftime("%Y-%m-%d", date)
         else:
@@ -181,6 +181,6 @@ class NOAAInterface:
         for item in results.get("results", []):
             if item.get("datatype", "")== "TMIN":
                 value = item.get("value", -99999) # -99999 means value was not listed
-                break
+                return float(value)/10
         
-        return float(value)/10
+        return -99999.9
