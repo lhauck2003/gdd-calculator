@@ -2,6 +2,7 @@ from django.db import connection
 from django.db.models import Q
 
 from .models import Crop, PlantedCrop, LifeStage, Field, Farm
+
 def db_health_check() -> bool:
     with connection.cursor() as cursor:
         cursor.execute('SELECT 1 AS ok')
@@ -22,7 +23,6 @@ def search_planted_crops(search: str = None,
                                                    'plantedcrop__crop__state',
                                                    'plantedcrop__field')
     
-
 def search_lifestages(search: str = None, crop: str = None):
     query_set = LifeStage.objects.select_related('lifestage', 'lifestage__crop')
 
