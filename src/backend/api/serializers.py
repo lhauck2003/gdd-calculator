@@ -1,8 +1,14 @@
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
-from .models import Crop, PlantedCrop, LifeStage, Field, Farm, GDD
+from .models import Crop, PlantedCrop, LifeStage, Field, Farm, GDD, Pest
+
+class PestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pest
+        fields = ['id', 'name', 'description']
 
 class CropSerializer(serializers.ModelSerializer):
+    pests = PestSerializer(many=True, read_only=True)
     class Meta:
         model = Crop
         fields = ['id', 'crop', 'base_temp']

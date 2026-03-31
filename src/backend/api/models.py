@@ -208,6 +208,31 @@ class State(models.Model):
         validators=[MaxLengthValidator(3)]
     )
 
+class Pest(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+
+    name = models.TextField(
+        null=True,
+        blank=True,
+        validators=[MaxLengthValidator(MAX_NAME_LENGTH)]
+    )
+
+    description = models.TextField(
+        null=True,
+        blank=True,
+        validators=[MaxLengthValidator(250)]
+    )
+
+    crop = models.ForeignKey(
+        to='Crop',
+        on_delete=models.CASCADE,
+        db_column='cropid'
+    )
+
 class Day:
     id = models.UUIDField(
         primary_key=True,
