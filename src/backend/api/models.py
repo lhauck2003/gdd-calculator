@@ -90,6 +90,8 @@ class PlantedCrop(models.Model):
         db_column='cropid'
     )
 
+    active = models.BooleanField(default=True) # whether the crop is still growing or has been harvested/removed from the field, used for filtering in queries and UI display
+
 class GDDCalcType(models.TextChoices):
     SIMPLE = "simple"
     SINE = "sine"
